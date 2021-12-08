@@ -33,8 +33,8 @@
 </div>
 	
 </div>
-<div class="col-md-6 border pb-3 pl-2 colh" v-if="loading"><Loading></Loading></div>
-<div class="col-md-6 border pb-3 pl-2 colh" v-else>
+
+<div class="col-md-6 border pb-3 pl-2 colh">
   <div class="border d-flex flex-row row" style="height:408px;">
     <div class="backgrnd d-flex align-items-start">
       <h4>Location</h4>
@@ -42,18 +42,16 @@
     <div class="mt-3">
       
      <h6>Country<span class="text-danger">*</span></h6>
-    <select id="inputState" class="form-select" v-model="country">
+    <select id="inputState" class="form-select" @change.prevent="countryvalidate()" v-model="country">
      <option  v-for="(countrylist,index) in countries" 
       :key="countrylist.id" :value="index">{{countrylist}}</option> 
-
-      
     </select>
      <h5>{{countryone}}</h5>
     </div>
     <div class="mt-3">
    
     <h6>Address Line 1 <span class="text-danger">*</span></h6>
-    <input type="text" class="form-control" id="listingName" placeholder="Entire home/apt in Dhaka" v-model="address_line_1" >
+    <input type="text" @keyup.prevent="line1_validate()" class="form-control" id="listingName" placeholder="Entire home/apt in Dhaka" v-model="address_line_1" >
    <h5>{{line1}}</h5>
     </div>
    
@@ -62,7 +60,7 @@
     <div>
    
      <h6>Address Line 2<span class="text-danger">*</span></h6>
-   <input type="text" class="form-control" id="listingName" placeholder="Entire home/apt in Dhaka" v-model="address_line_2">
+   <input type="text"  @keyup.prevent="line2_validate()" class="form-control" id="listingName" placeholder="Entire home/apt in Dhaka" v-model="address_line_2">
    <h5>{{line2}}</h5>
     </div>
     </div>
@@ -72,7 +70,7 @@
     <div>
   
      <h6>City/Town/ District <span class="text-danger">*</span></h6>
-   <input type="text" class="form-control" id="listingName" placeholder="Entire home/apt in Dhaka" v-model="city">
+   <input type="text"  @keyup.prevent="cityone_validate()" class="form-control" id="listingName" placeholder="Entire home/apt in Dhaka" v-model="city">
    <h5>{{cityone}}</h5>
     </div>
     </div>      
@@ -82,7 +80,7 @@
     <div class="col-md-5">
     <div>
      <h6>State/Province/County/Region<span class="text-danger">*</span></h6>
-   <input type="text" class="form-control" id="listingName" placeholder="Entire home/apt in Dhaka" v-model="state">
+   <input type="text" @keyup.prevent="stateone_validate()" class="form-control" id="listingName" placeholder="Entire home/apt in Dhaka" v-model="state">
    <h5>{{stateone}}</h5>
     </div>
     </div>
@@ -93,7 +91,7 @@
     
    
    <h6>ZIP/Postal Code<span class="text-danger">*</span></h6>
-   <input type="text" class="form-control" id="listingName" placeholder="Entire home/apt in Dhaka" v-model="postal_code">
+   <input type="text" @keyup.prevent="postal_code_validate()" class="form-control" id="listingName" placeholder="Entire home/apt in Dhaka" v-model="postal_code">
     <h5>{{postalcodeone}}</h5>
     </div>
     </div>      
@@ -101,10 +99,10 @@
   </div>
   <div class="d-flex justify-content-between mt-3">
     <div>
-   <router-link :to="{ path: '/description'+this.$route.params.id }" class="btn btn-primary mt-4">Back</router-link>
+   <router-link :to="{ path: '/description'+this.$route.params.id }" class="btn btn-danger mt-4">Back</router-link>
     </div>
     <div>
-   <button type="submit" class="btn btn-primary mt-4" :disabled="loading">
+   <button type="submit" class="btn btn-danger mt-4" :disabled="loading">
 <span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Next</button>                    
 
     </div>
@@ -125,12 +123,13 @@
 <script>
 
 import axios from "axios";
-import Loading from './Loading.vue';
+
 export default {
-  components: { Loading },
+  
   name: "user",
   data() {
     return {
+
       country:'',
       countries:'',
       address_line_1:'',
@@ -174,7 +173,7 @@ export default {
     
     this.city = localStorage.city;
     this.state = localStorage.state;
-    this.latitude = localStorage.latitude;
+    this.latitude = localStorage.latitude; 
     this.longitude = localStorage.longitude;
     this.postal_code = localStorage.postal_code;
     console.log("localStorage.countries");
@@ -193,7 +192,24 @@ export default {
     
  },
 methods: { 
-  
+  countryvalidate(){ 
+this.countryone=''
+  },
+  line1_validate(){ 
+this.line1=''
+  },
+  line2_validate(){ 
+this.line2=''    
+  },
+  postal_code_validate(){ 
+this.postalcodeone=''
+  },
+  stateone_validate(){ 
+ this.stateone=''
+  },
+  cityone_validate(){ 
+    this.cityone=''
+  },
 view() {
        //this.loading=true;
       let user = JSON.parse(localStorage.getItem("user"));
@@ -201,7 +217,7 @@ view() {
         .get(
           "https://vrent.techvill.org/vrentapi/api/listing/" +
             this.$route.params.id +
-            "/location",
+            "/location", 
           {
             headers: { Authorization: "Bearer " + user.token },
           }
@@ -283,7 +299,7 @@ view() {
         )
         .then((res) => {
          
-          
+          this.loading = false
           this.$router.push(`/amenities${res.data.data.id}`);            
         }).catch((res) => {
           res.data

@@ -5,12 +5,11 @@
       <div class="col-4 col-md-4 col-xs-4 " > <center><div class="loader">Loading...</div></center></div>
       <div class="col-4 col-md-4 col-xs-4"></div>
   </div>
-   
   </div>
 </template>
 
 
-<style >
+<style>
 .loader,
 .loader:before,
 .loader:after {

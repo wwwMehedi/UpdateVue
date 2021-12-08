@@ -34,8 +34,8 @@
 	</div>
 	</div>
   </div>
-<div class="col-md-6 border pb-3 pl-2 colh" v-if="loading"><Loading></Loading></div>
-<div class="col-md-6 border pb-3 pl-2 colh" v-else>
+
+<div class="col-md-6 border pb-3 pl-2 colh">
 
 	<div class="" style="height:189px;">
   <div class="row">
@@ -148,7 +148,12 @@
 	</div>
 </div>
 <div class="d-flex justify-content-end">
-      <button type="submit" class="btn btn-primary mt-4">Next</button>
+     <button type="submit" class="btn btn-danger mt-4" :disabled="loading"><span
+                  v-if="loading"
+                  class="spinner-border spinner-border-sm"
+                  role="status"
+                  aria-hidden="true"
+                ></span>Next</button>
 </div>
         
 </div>
@@ -165,10 +170,9 @@
 </template>
 <script>
 import axios from "axios";
-import { WebSocketServer } from 'ws';
-import Loading from './Loading.vue';
+
 export default {
-  components: { Loading },
+  
   name: "user",
   data() {
     return {
@@ -193,18 +197,31 @@ export default {
     };
   },
   mounted(){ 
-    this.view();
-    this.ws();
+    if(localStorage.getItem("totalbedrooms")&&localStorage.getItem("totalbed")
+    &&localStorage.getItem("bathroomss")&&localStorage.getItem("bed_type")
+    &&localStorage.getItem("bedtypes")&&localStorage.getItem("property_type")
+    &&localStorage.getItem("propertyviewlists")
+    &&localStorage.getItem("space_type")&&localStorage.getItem("rooms")
+    &&localStorage.getItem("accommodates")){ 
+      console.log("succesfully show from localstorage")
+    this.totalbedrooms = JSON.parse(localStorage.getItem("totalbedrooms"))
+    this.totalbed = JSON.parse(localStorage.getItem("totalbed"))
+    this.bathroomss = JSON.parse(localStorage.getItem("bathroomss"))
+    this.bed_type = JSON.parse(localStorage.getItem("bed_type"))
+    this.bedtypes = JSON.parse(localStorage.getItem("bedtypes"))
+    this.property_type = JSON.parse(localStorage.getItem("property_type"))
+    this.propertyviewlists = JSON.parse(localStorage.getItem("propertyviewlists"))
+    this.space_type = JSON.parse(localStorage.getItem("space_type"))
+    this.rooms = JSON.parse(localStorage.getItem("rooms"))
+    this.accommodates = JSON.parse(localStorage.getItem("accommodates"))
+    }else{ 
+   this.view();
+    }
+    
+    
   },
   methods:{ 
-    ws(){ 
-var server = new WebSocketServer();
-server.on('connection', function (socket) {
-  // Do something and then
  
-  socket.close(); //quit this connection
-});
-    },
     
     view() {
  
@@ -219,6 +236,7 @@ server.on('connection', function (socket) {
           }
         )
         .then((res) => {
+          console.log('server is running');
           this.propertyviews = res.data.data.property;
           this.propertyviewlists = res.data.data.property_type;
           this.rooms = res.data.data.space_type;
@@ -252,13 +270,25 @@ server.on('connection', function (socket) {
           this.space_type=res.data.data.property.space_type,
           this.accommodates=res.data.data.property.accommodates,
          
-         this.step=res.data.data.step
-         this.steps=res.data.data.steps;
+          this.step=res.data.data.step
+          this.steps=res.data.data.steps;
          
         });
     },
     add() {
         this.loading = true;
+
+        localStorage.setItem("totalbedrooms", JSON.stringify(this.totalbedrooms));
+        localStorage.setItem("totalbed", JSON.stringify(this.totalbed));
+        localStorage.setItem("bathroomss", JSON.stringify(this.bathroomss));
+        localStorage.setItem("bed_type", JSON.stringify(this.bed_type));
+        localStorage.setItem("bedtypes", JSON.stringify(this.bedtypes));
+        localStorage.setItem("property_type", JSON.stringify(this.property_type));
+        localStorage.setItem("propertyviewlists", JSON.stringify(this.propertyviewlists));
+        localStorage.setItem("space_type", JSON.stringify(this.space_type));
+        localStorage.setItem("rooms", JSON.stringify(this.rooms));
+        localStorage.setItem("accommodates", JSON.stringify(this.accommodates));
+        console.log("succesfully added into localstorage")
       let user = JSON.parse(localStorage.getItem("user"));
       axios
         .post(
@@ -281,9 +311,9 @@ server.on('connection', function (socket) {
           }
         )
         .then((res) => {
-           
+            this.loading=false;
             this.$router.push(`/description${res.data.data.id}`);
-           
+          
          // this.$router.push('/description');
  
         }).catch((res) => {

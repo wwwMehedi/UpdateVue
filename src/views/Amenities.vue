@@ -34,8 +34,8 @@
 </div>
 </div>
 
-<div class="col-md-6 border pb-3 pl-2 colh" v-if="loading"><Loading></Loading></div>
-<div class="col-md-6 border pb-3 pl-2 colh" v-else>
+
+<div class="col-md-6 border pb-3 pl-2 colh">
   
    <div class="backgrnd d-flex align-items-start row">
       <h4>Amenities</h4>
@@ -89,10 +89,8 @@
 <script>
 
 import axios from "axios";
-
-import Loading from './Loading.vue';
 export default {
-  components: { Loading },
+ 
   name: "user",
   data() {
     return {
@@ -143,28 +141,28 @@ view() {
             this.steps=res.data.data.steps;
             this.amenities=res.data.data.amenities;
             this.amen=res.data.data.property_amenities; 
-             this.loading = false;
+            this.loading = false;
         });
     },
-    
-    add() {
-      
+     
+    add() { 
+      this.loading=true;
       if(this.amen==''){ 
           this.errornameamen="fill up amenities field"
       } else { 
-      
+       
       localStorage.setItem("amenities", JSON.stringify(this.amenities));
       localStorage.setItem("amen", JSON.stringify(this.amen));
-      
+
       let user = JSON.parse(localStorage.getItem("user"));
       axios
         .post(
           "https://vrent.techvill.org/vrentapi/api/listing/" +
             this.$route.params.id +
             "/amenities",
-          
+                      
           { 
-           amenities:this.amen
+           amenities:this.amen    
           },
 
           {

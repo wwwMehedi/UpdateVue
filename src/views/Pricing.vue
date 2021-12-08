@@ -39,8 +39,8 @@
 </div>
 	
 </div>
-<div class="col-md-6 border pb-3 pl-2 colh" v-if="loading"><Loading></Loading></div>
-<div class="col-md-6 border pb-3 pl-2 colh" v-else>
+
+<div class="col-md-6 border pb-3 pl-2 colh">
   <div class="border d-flex flex-row row">
     <div class="backgrnd d-flex align-items-start">
       <h4>Base price</h4>
@@ -50,7 +50,7 @@
    <label class="mt-1">Nightly pricing</label>
   <div class="input-group">
   <span class="input-group-text" id="basic-addon1">$</span>
-  <input type="number" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1" v-model="price">
+  <input type="number" @keyup.prevent="price_validate()" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1" v-model="price">
  </div>
  <p class="text-danger">{{error}}</p>
     </div>
@@ -79,14 +79,14 @@
   <label>Cleaning fee</label>
   <div class="input-group">
   <span class="input-group-text" id="basic-addon1">$</span>
-  <input type="number" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1" v-model="cleaning_fee">
+  <input type="number" @keyup.prevent="cleaning_fee_validate()" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1" v-model="cleaning_fee">
  </div>
 <p class="text-danger">{{errorclfee}}</p>
 
   <label>Security deposit</label>
   <div class="input-group">
   <span class="input-group-text" id="basic-addon1">$</span>
-  <input type="number" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1" v-model="security_fee">
+  <input type="number" @keyup.prevent="security_fee_validate()" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1" v-model="security_fee">
  </div>  
 <div class="">
 <p class="text-danger">{{securitydeposit}}</p>
@@ -96,14 +96,14 @@
     <label>Additional Guest</label>       
   <div class="input-group">
   <span class="input-group-text" id="basic-addon1">$</span>
-  <input type="number" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1" v-model="guest_fee">
+  <input type="number" @keyup.prevent="guest_fee_validate()" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1" v-model="guest_fee">
  </div>
  <p class="text-danger">{{erroradguestfee}}</p>
 
  <label>Weekend pricing</label>
   <div class="input-group">
   <span class="input-group-text" id="basic-addon1">$</span>
-  <input type="number" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1" v-model="weekend_price">
+  <input type="number" @keyup.prevent="weekend_price_validate()" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1" v-model="weekend_price">
  </div>
  <p class="text-danger">{{wkndprice}}</p>
  </div>
@@ -140,9 +140,8 @@
 <script>
 
 import axios from "axios";
-import Loading from './Loading.vue';
+
 export default {
-  components: { Loading },
   name: "user",
   data() {
     return {
@@ -168,9 +167,23 @@ export default {
     
   },
 methods: { 
-   
+  weekend_price_validate(){ 
+  this.wkndprice=''
+  },
+  guest_fee_validate(){ 
+  this.erroradguestfee=''
+  },
+  security_fee_validate(){ 
+  this.securitydeposit=''
+  },
+  price_validate(){ 
+  this.error=''
+  },
+   cleaning_fee_validate(){ 
+   this.errorclfee=''
+   },
 view() {
-       this.loading=true;
+      
       let user = JSON.parse(localStorage.getItem("user"));
       axios
         .get(
@@ -190,7 +203,7 @@ view() {
             this.guest_fee=res.data.data.pricing.guest_fee;
             this.weekend_price=res.data.data.pricing.weekend_price;
             this.security_fee=res.data.data.pricing.security_fee;
-            this.loading=false;
+          
             
         });
     },
@@ -211,8 +224,8 @@ view() {
           this.wkndprice="fill up at least 5 dollars"
         }
         else { 
-          this.loading=true;
-    
+      this.loading=true;
+           
       let user = JSON.parse(localStorage.getItem("user"));
       axios
         .post(

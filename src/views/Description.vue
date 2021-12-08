@@ -31,8 +31,8 @@
 </div>		
 </div>
 </div>
-<div class="col-md-6 border pb-3 pl-2 colh" v-if="loading"><Loading></Loading></div>
-<div class="col-md-6 border pb-3 pl-2 colh" v-else>
+
+<div class="col-md-6 border pb-3 pl-2 colh">
   <div class="border d-flex flex-row row" style="height:408px;">
     <div class="backgrnd d-flex align-items-start">
       <h4>Description</h4>
@@ -42,14 +42,14 @@
      <h5>Listing Name<span class="text-danger">*</span></h5>
      <p class="text-danger">{{errorname}}</p>
    </label>
-   <input type="text" class="form-control" id="listingName" placeholder="Entire home/apt in Dhaka" v-model="name">
+   <input type="text" @keyup.prevent="name_validate()" class="form-control" id="listingName" placeholder="Entire home/apt in Dhaka" v-model="name">
     </div>
     <div class="mt-3">
       <label for="summery" class="form-label">
         <h5>Summery<span class="text-danger">*</span></h5>
         <p class="text-danger">{{errorsumary}}</p>
       </label>
-    <textarea class="form-control text-16 valid" id="summery" rows="6" aria-invalid="false" v-model="summary"></textarea>
+    <textarea  @keyup.prevent="summary_validate()" class="form-control text-16 valid" id="summery" rows="6" aria-invalid="false" v-model="summary"></textarea>
     </div>
     <div>
       <p class="pt-3">You can add more <span class="text-success">details</span> Tell travelers about your space and hosting style.</p>
@@ -61,10 +61,10 @@
   </div>
   <div class="d-flex justify-content-between mt-3">
     <div>
-    <router-link :to="{ path: '/basic'+this.$route.params.id }" class="btn btn-primary mt-4">Back</router-link>
+    <router-link :to="{ path: '/basic'+this.$route.params.id }" class="btn btn-danger mt-4">Back</router-link>
     </div>
 <div class="d-flex justify-content-end">
-               <button type="submit" class="btn btn-primary mt-4" :disabled="loading">
+               <button type="submit" class="btn btn-danger mt-4" :disabled="loading">
 <span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Next</button>                    
 
 </div>
@@ -83,11 +83,9 @@
 </form>
 </template>
 <script>
-import Loading from './Loading.vue';
-
 import axios from "axios";
 export default {
- components: { Loading },
+ 
   name: "user",
   data() {
     return {
@@ -101,13 +99,26 @@ export default {
 
     };
   },
+
   mounted(){ 
-    this.view();
-    
-  },
+    if(localStorage.getItem("name")&&localStorage.getItem("summary")){ 
+    console.log("succesfully show from localstorage")
+    this.name = JSON.parse(localStorage.getItem("name"))
+    this.summary = JSON.parse(localStorage.getItem("summary"))
+         }
+  else{ 
+      this.view();
+      }
+      },
 methods: { 
+  name_validate(){ 
+   this.errorname=''
+  },
+  summary_validate(){ 
+ this.errorsumary=''
+  },
 view() {
-   this.loading=true;
+  
       let user = JSON.parse(localStorage.getItem("user"));
       axios
         .get(
@@ -123,7 +134,7 @@ view() {
             this.steps=res.data.data.steps;
             this.name=res.data.data.property.name;
             this.summary=res.data.data.description.summary;
-            this.loading=false;
+            
         });
     },
     add() {
@@ -132,9 +143,11 @@ view() {
         }
          if(this.summary=='' || this.summary==null){ 
            this.loading=false;
-          this.errorsumary="fill up summary field"
+           this.errorsumary="fill up summary field"
         }else
       this.loading = true;
+      localStorage.setItem("name", JSON.stringify(this.name));
+      localStorage.setItem("summary", JSON.stringify(this.summary));
       let user = JSON.parse(localStorage.getItem("user"));
       axios
         .post(
@@ -154,7 +167,7 @@ view() {
           }
         )
         .then((res) => {
-          
+            this.loading = false    
             this.$router.push(`/location${res.data.data.id}`);
           
        
